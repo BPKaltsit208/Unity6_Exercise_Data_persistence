@@ -5,37 +5,40 @@ using UnityEngine.UI;
 
 public class MainManager : MonoBehaviour
 {
-    [FormerlySerializedAs("BrickPrefab")] public Brick brickPrefab;
-    [FormerlySerializedAs("LineCount")] public int lineCount = 6;
-    [FormerlySerializedAs("Ball")] public Rigidbody ball;
+    public Brick brickPrefab;
+    public Rigidbody ball;
 
-    [FormerlySerializedAs("ScoreText")] public Text scoreText;
-    [FormerlySerializedAs("GameOverText")] public GameObject gameOverText;
+    public GameObject gameOverText;
+    public Text scoreText;
     public Text playerNameText;
     public Text highScoreText;
-    
-    private bool _mStarted;
+
+    public Button exitButton;
+
+    public int lineCount = 6;
     private int _mPoints;
-    private string _mPlayerName;
     private int _mHighScore;
+
+    private string _mPlayerName;
     private string _mHighScorePlayerName;
-    
+
+    private bool _mStarted;
     private bool _mGameOver;
-    
+
     private void Start()
     {
         // Load player name and high score
         _mPlayerName = PlayerPrefs.GetString("PlayerName", "Player");
         _mHighScore = PlayerPrefs.GetInt("HighScore", 0);
         _mHighScorePlayerName = PlayerPrefs.GetString("HighScorePlayerName", "None");
-        
+
         UpdatePlayerNameText();
         UpdateHighScoreText();
-        
+
         const float step = 0.6f;
         var perLine = Mathf.FloorToInt(4.0f / step);
-        
-        var pointCountArray = new [] {1,1,2,2,5,5};
+
+        var pointCountArray = new[] { 1, 1, 2, 2, 5, 5 };
         for (var i = 0; i < lineCount; ++i)
         {
             for (var x = 0; x < perLine; ++x)
@@ -46,6 +49,8 @@ public class MainManager : MonoBehaviour
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
+
+        exitButton.onClick.AddListener(ExitGame);
     }
 
     private void Update()
@@ -74,7 +79,7 @@ public class MainManager : MonoBehaviour
     {
         _mPoints += point;
         scoreText.text = $"Score: {_mPoints}";
-        
+
         // Check for new high score
         if (_mPoints <= _mHighScore) return;
         _mHighScore = _mPoints;
@@ -98,5 +103,24 @@ public class MainManager : MonoBehaviour
     {
         _mGameOver = true;
         gameOverText.SetActive(true);
+    }
+
+    private void ExitGame()
+    {
+        Debug.Log("Exit Game");
+
+        // Save player name and high score
+        PlayerPrefs.SetString("PlayerName", _mPlayerName);
+        PlayerPrefs.SetInt("HighScore", _mHighScore);
+        PlayerPrefs.SetString("HighScorePlayerName", _mHighScorePlayerName);
+        PlayerPrefs.Save();
+
+        // Exit the application
+        Application.Quit();
+
+        // If running in the editor, stop playing
+        #if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+        #endif
     }
 }

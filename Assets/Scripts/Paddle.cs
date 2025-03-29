@@ -1,30 +1,25 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class Paddle : MonoBehaviour
 {
-    public float Speed = 2.0f;
-    public float MaxMovement = 2.0f;
-    
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    [FormerlySerializedAs("Speed")] public float speed = 2.0f;
+    [FormerlySerializedAs("MaxMovement")] public float maxMovement = 2.0f;
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        float input = Input.GetAxis("Horizontal");
+        var input = Input.GetAxis("Horizontal");
 
-        Vector3 pos = transform.position;
-        pos.x += input * Speed * Time.deltaTime;
+        var pos = transform.position;
+        pos.x += input * speed * Time.deltaTime;
 
-        if (pos.x > MaxMovement)
-            pos.x = MaxMovement;
-        else if (pos.x < -MaxMovement)
-            pos.x = -MaxMovement;
+        if (pos.x > maxMovement)
+            pos.x = maxMovement;
+        else if (pos.x < -maxMovement)
+            pos.x = -maxMovement;
 
         transform.position = pos;
     }

@@ -1,41 +1,40 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 public class Brick : MonoBehaviour
 {
+    private static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
     public UnityEvent<int> onDestroyed;
     
-    public int PointValue;
+    [FormerlySerializedAs("PointValue")] public int pointValue;
 
-    void Start()
+    private void Start()
     {
-        var renderer = GetComponentInChildren<Renderer>();
+        var componentInChildren = GetComponentInChildren<Renderer>();
 
-        MaterialPropertyBlock block = new MaterialPropertyBlock();
-        switch (PointValue)
+        var block = new MaterialPropertyBlock();
+        switch (pointValue)
         {
             case 1 :
-                block.SetColor("_BaseColor", Color.green);
+                block.SetColor(BaseColor, Color.green);
                 break;
             case 2:
-                block.SetColor("_BaseColor", Color.yellow);
+                block.SetColor(BaseColor, Color.yellow);
                 break;
             case 5:
-                block.SetColor("_BaseColor", Color.blue);
+                block.SetColor(BaseColor, Color.blue);
                 break;
             default:
-                block.SetColor("_BaseColor", Color.red);
+                block.SetColor(BaseColor, Color.red);
                 break;
         }
-        renderer.SetPropertyBlock(block);
+        componentInChildren.SetPropertyBlock(block);
     }
 
     private void OnCollisionEnter(Collision other)
     {
-        onDestroyed.Invoke(PointValue);
+        onDestroyed.Invoke(pointValue);
         
         //slight delay to be sure the ball have time to bounce
         Destroy(gameObject, 0.2f);

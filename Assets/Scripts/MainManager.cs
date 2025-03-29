@@ -11,15 +11,27 @@ public class MainManager : MonoBehaviour
 
     [FormerlySerializedAs("ScoreText")] public Text scoreText;
     [FormerlySerializedAs("GameOverText")] public GameObject gameOverText;
+    public Text playerNameText;
+    public Text highScoreText;
     
-    private bool _mStarted = false;
+    private bool _mStarted;
     private int _mPoints;
+    private string _mPlayerName;
+    private int _mHighScore;
+    private string _mHighScorePlayerName;
     
-    private bool _mGameOver = false;
+    private bool _mGameOver;
     
-    // Start is called before the first frame update
     private void Start()
     {
+        // Load player name and high score
+        _mPlayerName = PlayerPrefs.GetString("PlayerName", "Player");
+        _mHighScore = PlayerPrefs.GetInt("HighScore", 0);
+        _mHighScorePlayerName = PlayerPrefs.GetString("HighScorePlayerName", "None");
+        
+        UpdatePlayerNameText();
+        UpdateHighScoreText();
+        
         const float step = 0.6f;
         var perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -61,7 +73,25 @@ public class MainManager : MonoBehaviour
     private void AddPoint(int point)
     {
         _mPoints += point;
-        scoreText.text = $"Score : {_mPoints}";
+        scoreText.text = $"Score: {_mPoints}";
+        
+        // Check for new high score
+        if (_mPoints <= _mHighScore) return;
+        _mHighScore = _mPoints;
+        _mHighScorePlayerName = _mPlayerName;
+        PlayerPrefs.SetInt("HighScore", _mHighScore);
+        PlayerPrefs.SetString("HighScorePlayerName", _mHighScorePlayerName);
+        UpdateHighScoreText();
+    }
+
+    private void UpdatePlayerNameText()
+    {
+        playerNameText.text = $"Player: {_mPlayerName}";
+    }
+
+    private void UpdateHighScoreText()
+    {
+        highScoreText.text = $"High Score: {_mHighScore} by {_mHighScorePlayerName}";
     }
 
     public void GameOver()
